@@ -1,0 +1,4 @@
+GET http://localhost:5173/api/getHTMLiconURL?url=https://daisyui.com
+# https://www.bilibili.com/video/BV1Hz421y79L?spm_id_from=333.788.player.switch&vd_source=3483ace89a813f1f69f3d229f779fe1d
+
+Content-Type: application/json

@@ -1,0 +1,71 @@
+.slider {
+	/* slider */
+	--slider-width: 100%;
+	--slider-height: 12px;
+	--slider-bg: rgb(82, 82, 82);
+	--slider-border-radius: 999px;
+	/* level */
+	--level-color: #fff;
+	--level-transition-duration: 0.1s;
+}
+
+.slider.light {
+	--slider-bg: #e4e4e7;
+	--level-color: #7a4eff;
+}
+
+.slider {
+	width: 100%;
+	cursor: pointer;
+	display: -webkit-inline-box;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: reverse;
+	-ms-flex-direction: row-reverse;
+	flex-direction: row-reverse;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
+.slider .level {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	width: var(--slider-width);
+	height: var(--slider-height);
+	background: var(--slider-bg);
+	overflow: hidden;
+	border-radius: var(--slider-border-radius);
+	-webkit-transition: height var(--level-transition-duration);
+	-o-transition: height var(--level-transition-duration);
+	transition: height var(--level-transition-duration);
+	cursor: inherit;
+}
+
+.slider .level::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 0;
+	height: 0;
+	-webkit-box-shadow: -100vw 0 0 100vw var(--level-color);
+	box-shadow: -100vw 0 0 100vw var(--level-color);
+}
+
+.tooltip {
+	filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.02))
+		drop-shadow(0px 0px 2px rgba(27, 31, 35, 0.15));
+
+	transition: transform 0.2s ease 0.1s, opacity 0.2s ease 0.1s;
+	transform-origin: 50% 100%;
+}
+
+.tooltip .tooltip-arrow {
+	position: absolute;
+	top: 100%; /* 提示工具底部 */
+	left: 50%;
+	transform: translateX(-50%);
+	border-width: 5px;
+	border-style: solid;
+	border-color: #1d2129 transparent transparent transparent;
+}

@@ -1,0 +1,52 @@
+@property --h {
+	syntax: '<integer>';
+	inherits: false;
+	initial-value: 0;
+}
+@property --m {
+	syntax: '<integer>';
+	inherits: false;
+	initial-value: 0;
+}
+@property --s {
+	syntax: '<integer>';
+	inherits: false;
+	initial-value: 0;
+}
+
+@keyframes hour {
+	to {
+		--h: 24;
+	}
+}
+@keyframes minitus {
+	to {
+		--m: 60;
+	}
+}
+@keyframes seconds {
+	to {
+		--s: 60;
+	}
+}
+
+.time {
+	& .hour::after {
+		counter-reset: hour var(--h);
+		content: counter(hour, decimal-leading-zero);
+		animation: hour calc(60s * 60 * 24) infinite steps(24);
+		animation-delay: calc(-60s * 60 * var(--dh));
+	}
+	& .minitus::after {
+		counter-reset: minitus var(--m);
+		content: counter(minitus, decimal-leading-zero);
+		animation: minitus calc(60s * 60) infinite steps(60);
+		animation-delay: calc(-60s * var(--dm));
+	}
+	& .seconds::after {
+		counter-reset: seconds var(--s);
+		content: counter(seconds, decimal-leading-zero);
+		animation: seconds 60s infinite steps(60);
+		animation-delay: calc(-1s * var(--ds));
+	}
+}

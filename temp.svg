@@ -1,0 +1,10 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="32" fill="#F8D7E7"/>
+  <rect x="40" y="40" width="176" height="176" rx="20" fill="#E6BFCF"/>
+  <circle cx="68" cy="60" r="10" fill="#F0506E"/>
+  <circle cx="96" cy="60" r="10" fill="#F6D365"/>
+  <circle cx="124" cy="60" r="10" fill="#7ED6DF"/>
+  <rect x="148" y="54" width="64" height="10" rx="5" fill="#C9A0B6"/>
+  <text x="128" y="128" text-anchor="middle" font-size="48" font-family="Arial, sans-serif" fill="white" font-weight="bold" dominant-baseline="middle">404</text>
+  <text x="128" y="160" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="white" font-weight="bold" dominant-baseline="middle">PAGE NOT FOUND</text>
+</svg>
