@@ -45,7 +45,7 @@ const DockItem: FC<
 	shortcutData & {
 		className?: string
 		style?: React.CSSProperties
-		onOpen?: (url: string) => void
+		onOpen?: (url: string, blank:boolean) => void
 		onDelete?: (id: shortcutData['id']) => void
 		onMove?: (id: shortcutData['id']) => void
 		onSubmit?: (data: shortcutData) => void
@@ -80,7 +80,7 @@ const DockItem: FC<
 								setTooltipShow(false)
 								setPopoverShow(true)
 							}}
-							onClick={() => onOpen?.(props.url)}
+							onClick={() => onOpen?.(props.url, false)}
 							style={{
 								backgroundColor: props.bgColor,
 								padding: `${props.padding}px`,
@@ -104,7 +104,7 @@ const DockItem: FC<
 						<div
 							onClick={() => {
 								setPopoverShow(false)
-								onOpen?.(props.url)
+								onOpen?.(props.url, true)
 							}}
 							className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent/10 hover:text-white"
 						>
@@ -143,7 +143,7 @@ const DockItem: FC<
 						{props.RightClickData?.map((item) => (
 							<div
 								key={item.uuid}
-								onClick={() => onOpen?.(item.url)}
+								onClick={() => onOpen?.(item.url, false)}
 								className="flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent/10 hover:text-white"
 							>
 								<FaLink size={14} />

@@ -10,8 +10,12 @@ import { useDrag } from '@use-gesture/react'
 
 import { IoIosSearch } from 'react-icons/io'
 
-const openPage = (url: string) => {
-    window.open(url, '_blank')
+const openPage = (url: string,blank?:boolean) => {
+    if(blank){
+        window.open(url, '_blank')
+        return
+    }
+    window.open(url)
 }
 
 type Props = {

@@ -14,6 +14,12 @@ export const useGlobalData = create<GlobalData>((set, get) => ({
 	setShowLaunchpad: (showLaunchpad) => set({ showLaunchpad }),
 }))
 
-export const openPage = (url: string) => {
-	window.open(url, '_blank')
+export const openPage = (url: string, blank:boolean=false) => {
+	console.log({blank})
+
+	if(blank){
+		window.open(url, '_blank')
+		return
+	}
+	window.open(url,'_self')
 }
