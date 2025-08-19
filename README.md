@@ -14,6 +14,11 @@
 
 # 使用方法
 ```bash
-npm install
-npm run dev
+git clone https://github.com/LQ250/react-template.git
+
+cd react-template
+
+bun install
+
+bun run dev
 ```
