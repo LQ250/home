@@ -1,26 +1,32 @@
+/**
+ * @file DraggableY.tsx
+ * @description 可以在Y 轴拖动的组件, 并未集成持久化, 需要外部进行管理
+ * @author LQ250
+ * @date 2025-08-20 08:00:53
+ */
 import { useEffect, useRef } from 'react'
 import { atom, useAtomValue } from 'jotai'
-import { Rnd } from 'react-rnd'
+import { Rnd, type Props } from 'react-rnd'
 
 type DraggableYProps = {
     initialY: number // 初始偏移量
     onDragEnd?: (y: number) => void // 拖拽结束时回调
-    minY?: number // 最小 Y 边界
-    maxY?: number // 最大 Y 边界
     children: React.ReactNode
-}
+} & Props
 
 // * 是否允许拖动
-export const isDragAtom = atom<boolean>(false)
+export const isDragAtom = atom<boolean>(true)
 
-export const DraggableY: React.FC<
-    DraggableYProps & {
-        className?: string
-        style?: React.CSSProperties
-    }
-> = ({ initialY, onDragEnd, children, ...props }) => {
+export const DraggableY: React.FC<DraggableYProps> = ({
+    initialY,
+    onDragEnd,
+    children,
+    ...props
+}) => {
     const ref = useRef<Rnd>(null)
 
+    // 初始位置 使用 useEffect 是因为 initialY 是一个持久化的值, 初始是 0 ,
+    // 需要等待一段时间才会更新, 而 Rnd 组件的 default 定义了就不会改变
     useEffect(() => {
         if (ref.current) {
             ref.current.updatePosition({ x: 0, y: initialY })

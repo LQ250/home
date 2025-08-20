@@ -30,7 +30,7 @@ export const Time = (): ReactNode => {
 
     return (
         <DraggableY
-            className='!w-full'
+            className='top-12 !w-full'
             initialY={timeOffsetY}
             onDragEnd={(y) => setTimeOffsetY(y)}
         >
