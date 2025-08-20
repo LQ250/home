@@ -6,12 +6,14 @@
  */
 import type { ReactNode, CSSProperties } from 'react'
 import { useMemo } from 'react'
-import { useAtom } from 'jotai'
+import { useAtom, atom, useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+import { cn } from '@/lib/utils'
 import { DraggableY } from '@/components/DraggableY'
 import './style.css'
 
 const TimeOffsetYAtom = atomWithStorage<number>('TimeOffsetY', 140)
+export const TimeShowAtom = atom<boolean>(true)
 
 export const Time = (): ReactNode => {
     const time = useMemo<CSSProperties>(() => {
@@ -27,10 +29,13 @@ export const Time = (): ReactNode => {
     }, [])
 
     const [timeOffsetY, setTimeOffsetY] = useAtom(TimeOffsetYAtom)
+    const timeShow = useAtomValue(TimeShowAtom)
 
     return (
         <DraggableY
-            className='top-12 !w-full'
+            className={cn('top-12 !w-full', {
+                hidden: !timeShow,
+            })}
             initialY={timeOffsetY}
             onDragEnd={(y) => setTimeOffsetY(y)}
         >

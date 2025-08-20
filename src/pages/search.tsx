@@ -1,9 +1,14 @@
 import type { ReactNode } from 'react'
 import { useRef, useState } from 'react'
+import { useAtom, useAtomValue, atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 import { X, Search as SearchIcon, ArrowUpRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { DraggableY } from '@/components/DraggableY'
+
+const SearchOffsetYAtom = atomWithStorage<number>('SearchOffsetY', 0)
+export const SearchShowAtom = atom<boolean>(true)
 
 const SearchFun = (value: string) => {
     if (!value) {
@@ -15,6 +20,8 @@ const SearchFun = (value: string) => {
 }
 
 export const Search = (): ReactNode => {
+    const searchShow = useAtomValue(SearchShowAtom)
+    const [searchOffsetY, setSearchOffsetY] = useAtom(SearchOffsetYAtom)
     const [value, setValue] = useState('')
     const [sug, setSug] = useState<string[]>([])
 
@@ -40,7 +47,13 @@ export const Search = (): ReactNode => {
     }
 
     return (
-        <DraggableY className='!top-62 !w-full' initialY={0}>
+        <DraggableY
+            className={cn('!top-62 !w-full', {
+                hidden: !searchShow,
+            })}
+            initialY={searchOffsetY}
+            onDragEnd={(y) => setSearchOffsetY(y)}
+        >
             <div className='drag-handle bg-muted/30 relative left-1/2 h-12 w-full max-w-[700px] min-w-[80vw] -translate-x-1/2 rounded-md shadow-lg backdrop-blur-sm md:min-w-[400px]'>
                 <form
                     onSubmit={(e) => {
