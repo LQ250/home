@@ -6,12 +6,14 @@
  */
 import type { FC, ReactNode } from 'react'
 
+/* =========| pages |========= */
 import { Bg } from '@/pages/bg'
 import { Dock } from '@/pages/nav/dock'
 import { Launchpad } from '@/pages/nav/launchpad'
 import { Search } from '@/pages/search'
 import { Time } from '@/pages/time/time'
 
+/* =========| components |========= */
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 

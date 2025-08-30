@@ -17,9 +17,10 @@ import {
 import { type FC, type ReactNode, useMemo, useState } from 'react'
 
 /* =========| jotai |========= */
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
+/* =========| utils |========= */
 import { cn } from '@/lib/utils'
 
 /* =========| hooks |========= */
@@ -45,8 +46,10 @@ import {
 
 import { DraggableY } from '@/components/DraggableY'
 
+/* =========| 与launchpad组件进行配合 |========= */
 import { DockAdd } from './dockItme'
-import { LaunchpadShowAtom } from './launchpad'
+import { DockSet } from './dockItme'
+import { LaunchpadDataAtom, LaunchpadShowAtom } from './launchpad'
 import type { shortcutData } from './types'
 import { OPEN_URL, chunkArray } from './utils'
 
@@ -112,7 +115,7 @@ const DefaultDockData = [
     },
 ]
 
-const DockDataAtom = atomWithStorage<shortcutData[]>(
+export const DockDataAtom = atomWithStorage<shortcutData[]>(
     'DockData',
     DefaultDockData
 )
@@ -121,8 +124,10 @@ const DockDataAtom = atomWithStorage<shortcutData[]>(
 const DockItem: FC<
     shortcutData & {
         onDelete: (id: shortcutData['id']) => void
+        onChange: (newValue: shortcutData) => void
+        onMoveToLaunchpad: (id: shortcutData['id']) => void
     }
-> = ({ icon, text, padding, bgColor, url, RightClickData }) => {
+> = ({ onDelete, onChange, onMoveToLaunchpad, ...props }) => {
     const [popoverOpen, setPopoverOpen] = useState(false)
     const [tooltipOpen, setTooltipOpen] = useState(false)
 
@@ -140,11 +145,11 @@ const DockItem: FC<
                     <TooltipTrigger asChild>
                         <div
                             style={{
-                                padding,
-                                backgroundColor: bgColor,
+                                padding: props.padding,
+                                backgroundColor: props.bgColor,
                             }}
                             className='relative size-16 cursor-pointer overflow-clip rounded-lg'
-                            onClick={() => OPEN_URL(url)}
+                            onClick={() => OPEN_URL(props.url)}
                             onContextMenu={(e) => {
                                 e.preventDefault()
                                 setPopoverOpen(true)
@@ -153,33 +158,42 @@ const DockItem: FC<
                             <img
                                 draggable={false}
                                 className='size-full overflow-clip rounded-lg'
-                                src={icon}
+                                src={props.icon}
                                 alt=''
                             />
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{text}</p>
+                        <p>{props.text}</p>
                     </TooltipContent>
                 </Tooltip>
             </PopoverTrigger>
             <PopoverContent className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'>
                 <Button
-                    onClick={() => OPEN_URL(url, true)}
+                    onClick={() => OPEN_URL(props.url, true)}
                     className='hover:bg-foreground/10 bg-transparent p-1'
                 >
                     <SquareArrowOutUpRight /> 新标签页打开
                 </Button>
 
-                <Button className='hover:bg-foreground/10 bg-transparent p-1'>
-                    <NotebookPen /> 编辑
-                </Button>
-
-                <Button className='hover:bg-foreground/10 bg-transparent p-1'>
+                <Button
+                    onClick={() => onDelete(props.id)}
+                    className='hover:bg-foreground/10 bg-transparent p-1'
+                >
                     <Trash2 /> 删除
                 </Button>
 
-                {RightClickData?.map((item) => (
+                <DockSet
+                    className='hover:bg-foreground/10 bg-transparent p-1'
+                    value={props}
+                    onChange={onChange}
+                >
+                    <Button className='hover:bg-foreground/10 bg-transparent p-1'>
+                        <NotebookPen /> 编辑
+                    </Button>
+                </DockSet>
+
+                {props.RightClickData?.map((item) => (
                     <Button
                         key={item.uuid}
                         className='hover:bg-foreground/10 bg-transparent p-1'
@@ -189,7 +203,10 @@ const DockItem: FC<
                     </Button>
                 ))}
 
-                <Button className='hover:bg-foreground/10 bg-transparent p-1'>
+                <Button
+                    className='hover:bg-foreground/10 bg-transparent p-1'
+                    onClick={() => onMoveToLaunchpad(props.id)}
+                >
                     <ArrowUpToLine /> 移动到启动台
                 </Button>
             </PopoverContent>
@@ -248,6 +265,7 @@ export const Dock = (): ReactNode => {
 
     const [dockOffsetY, setDockOffsetY] = useAtom(DockOffsetYAtom)
     const [dockData, setDockData] = useAtom(DockDataAtom)
+    const setLaunchpadData = useSetAtom(LaunchpadDataAtom)
 
     const { width } = useWindowSize()
 
@@ -295,6 +313,20 @@ export const Dock = (): ReactNode => {
         setDockData((prev) => prev.filter((item) => item.id !== id))
     }
 
+    const onChange = (newValue: shortcutData) => {
+        setDockData((prev) =>
+            prev.map((item) => (item.id === newValue.id ? newValue : item))
+        )
+    }
+
+    const onMoveToLaunchpad = (id: shortcutData['id']) => {
+        setLaunchpadData((prev) => {
+            const itemToMove = dockData.find((item) => item.id === id)
+            return itemToMove ? [...prev, itemToMove] : prev
+        })
+        setDockData((prev) => prev.filter((item) => item.id !== id))
+    }
+
     return (
         <DraggableY
             className='!w-full'
@@ -315,6 +347,8 @@ export const Dock = (): ReactNode => {
                                         key={index}
                                         {...item}
                                         onDelete={onDelete}
+                                        onChange={onChange}
+                                        onMoveToLaunchpad={onMoveToLaunchpad}
                                     />
                                 ))}
                             </CarouselItem>

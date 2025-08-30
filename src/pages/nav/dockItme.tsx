@@ -367,17 +367,20 @@ export const DockAdd = ({
 }
 
 export const DockSet: FC<{
+    className?: string
     children: ReactNode
     value: shortcutData
     onChange: (newValue: shortcutData) => void
-}> = ({ children, value, onChange }): ReactNode => {
-    const { data, setDataValue, validateData, clearData } = useDockData(value)
+}> = ({ className, children, value, onChange }): ReactNode => {
+    const { data, setDataValue, validateData } = useDockData(value)
 
     const [open, setOpen] = useState(false)
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+            <AlertDialogTrigger asChild className={className}>
+                {children}
+            </AlertDialogTrigger>
             <AlertDialogContent className=''>
                 <AlertDialogHeader>
                     <AlertDialogTitle>添加快捷方式</AlertDialogTitle>
@@ -456,13 +459,7 @@ export const DockSet: FC<{
                 </Tabs>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel
-                        onClick={() => {
-                            clearData()
-                        }}
-                    >
-                        取消
-                    </AlertDialogCancel>
+                    <AlertDialogCancel>取消</AlertDialogCancel>
                     <Button
                         onClick={() => {
                             const data = validateData()
@@ -473,6 +470,7 @@ export const DockSet: FC<{
                             }
 
                             onChange(data)
+                            setOpen(false)
                         }}
                     >
                         提交

@@ -1,3 +1,9 @@
+/**
+ * @file launchpad.tsx
+ * @description 启动台组件, 用于显示启动台, 包含添加, 删除, 编辑等功能
+ * @author LQ250
+ * @date 2025-08-30 09:38:20
+ */
 /* =========| icon |========= */
 import {
     ArrowUpToLine,
@@ -11,7 +17,7 @@ import {
 import { type FC, type ReactNode, useMemo, useState } from 'react'
 
 /* =========| jotai |========= */
-import { atom, useAtom, useAtomValue } from 'jotai'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
 import { cn } from '@/lib/utils'
@@ -37,6 +43,9 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip'
 
+/* =========| 与dock组件进行配合 |========= */
+import { DockDataAtom } from './dock'
+import { DockSet } from './dockItme'
 import type { shortcutData } from './types'
 import { OPEN_URL, chunkArray } from './utils'
 
@@ -327,8 +336,10 @@ export const LaunchpadDataAtom = atomWithStorage<shortcutData[]>(
 const LaunchpadItem: FC<
     shortcutData & {
         onDelete: (id: shortcutData['id']) => void
+        onChange: (newValue: shortcutData) => void
+        onMoveToDock: (id: shortcutData['id']) => void
     }
-> = ({ id, icon, text, padding, bgColor, url, RightClickData, onDelete }) => {
+> = ({ onDelete, onChange, onMoveToDock, ...props }) => {
     const [popoverOpen, setPopoverOpen] = useState(false)
     const [tooltipOpen, setTooltipOpen] = useState(false)
 
@@ -346,11 +357,11 @@ const LaunchpadItem: FC<
                     <TooltipTrigger asChild>
                         <div
                             style={{
-                                padding,
-                                backgroundColor: bgColor,
+                                padding: props.padding,
+                                backgroundColor: props.bgColor,
                             }}
                             className='relative size-16 cursor-pointer rounded-lg'
-                            onClick={() => OPEN_URL(url)}
+                            onClick={() => OPEN_URL(props.url)}
                             onContextMenu={(e) => {
                                 e.preventDefault()
                                 console.log('setPopoverOpen')
@@ -360,39 +371,40 @@ const LaunchpadItem: FC<
                             <img
                                 draggable={false}
                                 className='size-full overflow-clip rounded-lg'
-                                src={icon}
+                                src={props.icon}
                                 alt=''
                             />
 
                             <p className='absolute top-full left-0 mt-1 w-full overflow-hidden text-center text-xs text-ellipsis whitespace-nowrap text-white'>
-                                {text}
+                                {props.text}
                             </p>
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>{text}</p>
+                        <p>{props.text}</p>
                     </TooltipContent>
                 </Tooltip>
             </PopoverTrigger>
             <PopoverContent className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'>
                 <Button
-                    onClick={() => OPEN_URL(url, true)}
+                    onClick={() => OPEN_URL(props.url, true)}
                     className='hover:bg-foreground/10 bg-transparent p-1'
                 >
                     <SquareArrowOutUpRight /> 新标签页打开
                 </Button>
-
-                <Button className='hover:bg-foreground/10 bg-transparent p-1'>
-                    <NotebookPen /> 编辑
-                </Button>
+                <DockSet value={props} onChange={onChange}>
+                    <Button className='hover:bg-foreground/10 bg-transparent p-1'>
+                        <NotebookPen /> 编辑
+                    </Button>
+                </DockSet>
 
                 <Button
                     className='hover:bg-foreground/10 bg-transparent p-1'
-                    onClick={() => onDelete(id)}
+                    onClick={() => onDelete(props.id)}
                 >
                     <Trash2 /> 删除
                 </Button>
-                {RightClickData?.map((item) => (
+                {props.RightClickData?.map((item) => (
                     <Button
                         key={item.uuid}
                         className='hover:bg-foreground/10 bg-transparent p-1'
@@ -401,14 +413,18 @@ const LaunchpadItem: FC<
                         <Link /> {item.text}
                     </Button>
                 ))}
-                <Button className='hover:bg-foreground/10 bg-transparent p-1'>
-                    <ArrowUpToLine /> 移动到dock栏
+                <Button
+                    onClick={() => onMoveToDock(props.id)}
+                    className='hover:bg-foreground/10 bg-transparent p-1'
+                >
+                    <ArrowUpToLine className='rotate-180' /> 移动到dock栏
                 </Button>
             </PopoverContent>
         </Popover>
     )
 }
 
+/* =========| 常量 方便计算 |========= */
 const DockGap = 20
 const DockItemWidth = 64
 const DockItemHeight = 84
@@ -419,6 +435,7 @@ export const Launchpad = (): ReactNode => {
     const launchpadShow = useAtomValue(LaunchpadShowAtom)
 
     const [launchpadData, setLaunchpadData] = useAtom(LaunchpadDataAtom)
+    const setDockData = useSetAtom(DockDataAtom)
 
     const windowSize = useWindowSize()
 
@@ -473,6 +490,20 @@ export const Launchpad = (): ReactNode => {
         setLaunchpadData((prev) => prev.filter((item) => item.id !== id))
     }
 
+    const onChange = (newValue: shortcutData) => {
+        setLaunchpadData((prev) =>
+            prev.map((item) => (item.id === newValue.id ? newValue : item))
+        )
+    }
+
+    const onMoveToDock = (id: shortcutData['id']) => {
+        setDockData((prev) => {
+            const itemToMove = launchpadData.find((item) => item.id === id)
+            return itemToMove ? [...prev, itemToMove] : prev
+        })
+        setLaunchpadData((prev) => prev.filter((item) => item.id !== id))
+    }
+
     if (dockGroupData.totalCount === 0) return null
 
     return (
@@ -501,6 +532,8 @@ export const Launchpad = (): ReactNode => {
                                 key={index}
                                 {...item}
                                 onDelete={onDelete}
+                                onChange={onChange}
+                                onMoveToDock={onMoveToDock}
                             />
                         ))}
                     </CarouselItem>

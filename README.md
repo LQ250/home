@@ -22,3 +22,7 @@ bun install
 
 bun run dev
 ```
+
+# 待办
+
+- [ ] 添加设置包括背景, 数据导入导出等
