@@ -13,6 +13,8 @@
     "prettier-plugin-tailwindcss"
   ],
   "importOrder": [
+    "<THIRD_PARTY_TYPES>",
+    "^lucide-react$",
     "^path$",
     "^vite$",
     "^@vitejs/(.*)$",
@@ -47,5 +49,7 @@
     "^@/components/(.*)$",
     "^@/features/(.*)$",
     "^[./]"
-  ]
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

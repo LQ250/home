@@ -1,14 +1,35 @@
+/**
+ * @file search.tsx
+ * @description 搜索栏组件, 集成了搜索和建议功能
+ * @author LQ250
+ * @date 2025-08-20 22:38:40
+ */
+/* =========| 图标 |========= */
+import { ArrowUpRight, Search as SearchIcon, X } from 'lucide-react'
+
+/* =========| 基础 |========= */
 import type { ReactNode } from 'react'
 import { useRef, useState } from 'react'
-import { useAtom, useAtomValue, atom } from 'jotai'
+
+/* =========| jotai |========= */
+import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
-import { X, Search as SearchIcon, ArrowUpRight } from 'lucide-react'
+/* =========| sonner |========= */
 import { toast } from 'sonner'
+
+/* =========| utils |========= */
 import { cn } from '@/lib/utils'
+
+// =========| components |========= //
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip'
+
 import { DraggableY } from '@/components/DraggableY'
 
 const SearchOffsetYAtom = atomWithStorage<number>('SearchOffsetY', 0)
-export const SearchShowAtom = atom<boolean>(true)
 
 const SearchFun = (value: string) => {
     if (!value) {
@@ -20,7 +41,6 @@ const SearchFun = (value: string) => {
 }
 
 export const Search = (): ReactNode => {
-    const searchShow = useAtomValue(SearchShowAtom)
     const [searchOffsetY, setSearchOffsetY] = useAtom(SearchOffsetYAtom)
     const [value, setValue] = useState('')
     const [sug, setSug] = useState<string[]>([])
@@ -48,9 +68,7 @@ export const Search = (): ReactNode => {
 
     return (
         <DraggableY
-            className={cn('!top-62 !w-full', {
-                hidden: !searchShow,
-            })}
+            className={cn('!top-62 !w-full')}
             initialY={searchOffsetY}
             onDragEnd={(y) => setSearchOffsetY(y)}
         >
@@ -71,19 +89,37 @@ export const Search = (): ReactNode => {
                             getSug(e.target.value)
                         }}
                     />
-                    <button
-                        type='button'
-                        className='cursor-pointer'
-                        onClick={() => {
-                            setValue('')
-                            setSug([])
-                        }}
-                    >
-                        <X size={20} />
-                    </button>
-                    <button type='submit' className='mr-3 cursor-pointer'>
-                        <SearchIcon size={20} />
-                    </button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type='button'
+                                className='cursor-pointer'
+                                onClick={() => {
+                                    setValue('')
+                                    setSug([])
+                                }}
+                            >
+                                <X size={20} />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>清空</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type='submit'
+                                className='mr-3 cursor-pointer'
+                            >
+                                <SearchIcon size={20} />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>搜索</p>
+                        </TooltipContent>
+                    </Tooltip>
                 </form>
             </div>
 

@@ -1,4 +1,13 @@
+/**
+ * @file bg.tsx
+ * @description 背景组件, 用于显示背景图片
+ * @author LQ250
+ * @date 2025-08-20 22:40:35
+ */
+/* =========| react |========= */
 import type { ReactNode } from 'react'
+
+/* =========| jotai |========= */
 import { useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
