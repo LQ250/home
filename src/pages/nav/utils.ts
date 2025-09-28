@@ -17,12 +17,26 @@ export function chunkArray<T>(array: T[], size: number): T[][] {
         result.push(chunk)
     }
     return result
-} /* =========| 工具函数 |========= */
+}
+
+/* =========| 工具函数 |========= */
 export const OPEN_URL = (url: string, isBlank = false) => {
     if (isBlank) {
-        window.open(url)
-        return
+        window.open(url, '_blank')
+    } else {
+        window.open(url, '_self')
+    }
+}
+
+export function isSvgUrl(url: string): boolean {
+    if (!url) return false
+
+    // 检查是否是内联 SVG
+    if (url.trim().startsWith('<svg')) {
+        return true
     }
 
-    window.open(url)
+    // 检查 URL 是否以 .svg 结尾（忽略查询参数）
+    const urlWithoutParams = url.split('?')[0].split('#')[0] // 同时移除片段标识符
+    return urlWithoutParams.toLowerCase().endsWith('.svg')
 }

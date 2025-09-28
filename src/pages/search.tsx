@@ -58,12 +58,18 @@ export const Search = (): ReactNode => {
         const abort = new AbortController()
         abortController.current = abort
 
-        fetch(`http://127.0.0.1:3000/api/sug/${keyword.trim()}`, {
-            signal: abort.signal,
-            mode: 'cors',
-        })
+        fetch(
+            `${import.meta.env.VITE_API_BASE_URL || '/api'}/sug/${keyword.trim()}`,
+            {
+                signal: abort.signal,
+                mode: 'cors',
+            }
+        )
             .then((res) => res.json())
             .then(setSug)
+            .catch((err) => {
+                console.error(err)
+            })
     }
 
     return (

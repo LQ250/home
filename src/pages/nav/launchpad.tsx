@@ -344,7 +344,7 @@ const LaunchpadItem: FC<
     const [tooltipOpen, setTooltipOpen] = useState(false)
 
     return (
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <Popover open={popoverOpen}>
             <PopoverTrigger>
                 <Tooltip
                     open={tooltipOpen}
@@ -361,7 +361,7 @@ const LaunchpadItem: FC<
                                 backgroundColor: props.bgColor,
                             }}
                             className='relative size-16 cursor-pointer rounded-lg'
-                            onClick={() => OPEN_URL(props.url)}
+                            onClick={() => OPEN_URL(props.url, true)}
                             onContextMenu={(e) => {
                                 e.preventDefault()
                                 console.log('setPopoverOpen')
@@ -385,14 +385,26 @@ const LaunchpadItem: FC<
                     </TooltipContent>
                 </Tooltip>
             </PopoverTrigger>
-            <PopoverContent className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'>
+            <PopoverContent
+                onInteractOutside={() => setPopoverOpen(false)}
+                onEscapeKeyDown={() => setPopoverOpen(false)}
+                className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'
+            >
                 <Button
-                    onClick={() => OPEN_URL(props.url, true)}
+                    onClick={() => {
+                        OPEN_URL(props.url, true)
+                        setPopoverOpen(false)
+                    }}
                     className='hover:bg-foreground/10 bg-transparent p-1'
                 >
                     <SquareArrowOutUpRight /> 新标签页打开
                 </Button>
-                <DockSet value={props} onChange={onChange}>
+                <DockSet
+                    value={props}
+                    onChange={(newValue) => {
+                        onChange(newValue)
+                    }}
+                >
                     <Button className='hover:bg-foreground/10 bg-transparent p-1'>
                         <NotebookPen /> 编辑
                     </Button>
@@ -400,7 +412,10 @@ const LaunchpadItem: FC<
 
                 <Button
                     className='hover:bg-foreground/10 bg-transparent p-1'
-                    onClick={() => onDelete(props.id)}
+                    onClick={() => {
+                        onDelete(props.id)
+                        setPopoverOpen(false)
+                    }}
                 >
                     <Trash2 /> 删除
                 </Button>
@@ -408,13 +423,19 @@ const LaunchpadItem: FC<
                     <Button
                         key={item.uuid}
                         className='hover:bg-foreground/10 bg-transparent p-1'
-                        onClick={() => OPEN_URL(item.url)}
+                        onClick={() => {
+                            OPEN_URL(item.url, true)
+                            setPopoverOpen(false)
+                        }}
                     >
                         <Link /> {item.text}
                     </Button>
                 ))}
                 <Button
-                    onClick={() => onMoveToDock(props.id)}
+                    onClick={() => {
+                        onMoveToDock(props.id)
+                        setPopoverOpen(false)
+                    }}
                     className='hover:bg-foreground/10 bg-transparent p-1'
                 >
                     <ArrowUpToLine className='rotate-180' /> 移动到dock栏

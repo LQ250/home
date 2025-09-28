@@ -4,7 +4,7 @@
  * @author LQ250
  * @date 2025-08-23 18:18:33
  */
-import { CirclePlus, Send, X } from 'lucide-react'
+import { CirclePlus, Loader2Icon, Send, X } from 'lucide-react'
 
 import type { FC, ReactNode } from 'react'
 import { useState } from 'react'
@@ -250,9 +250,26 @@ export const DockAdd = ({
 }): ReactNode => {
     const { data, setDataValue, validateData, clearData } = useDockData()
 
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState<boolean>(false)
 
     const setDockData = useSetAtom(LaunchpadDataAtom)
+
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    const getIcon = async () => {
+        if (!data.url) {
+            toast.error('请输入网址')
+            return
+        }
+
+        setIsLoading(true)
+        const res = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL || '/api'}/get-icon?url=${encodeURIComponent(data.url)}`
+        )
+        const json: { url: string } = await res.json()
+        setDataValue('icon', json.url)
+        setIsLoading(false)
+    }
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
@@ -299,13 +316,25 @@ export const DockAdd = ({
                         <label>
                             图标网址 <span className='text-red-500'>*</span>
                         </label>
-                        <Input
-                            name='icon'
-                            value={data.icon}
-                            onChange={(e) =>
-                                setDataValue('icon', e.target.value)
-                            }
-                        />
+                        <div className='flex gap-x-2'>
+                            <Input
+                                name='icon'
+                                value={data.icon}
+                                onChange={(e) =>
+                                    setDataValue('icon', e.target.value)
+                                }
+                            />
+                            {isLoading ? (
+                                <Button variant='outline'>
+                                    <Loader2Icon className='animate-spin' />{' '}
+                                    正在获取
+                                </Button>
+                            ) : (
+                                <Button variant='outline' onClick={getIcon}>
+                                    获取图标
+                                </Button>
+                            )}
+                        </div>
                         <label>图标背景</label>
                         <Color
                             defaultValue={defaultColors[0]}
@@ -383,7 +412,7 @@ export const DockSet: FC<{
             </AlertDialogTrigger>
             <AlertDialogContent className=''>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>添加快捷方式</AlertDialogTitle>
+                    <AlertDialogTitle>编辑快捷方式</AlertDialogTitle>
                     <AlertDialogDescription>
                         请输入快捷方式的名称和 URL
                     </AlertDialogDescription>

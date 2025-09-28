@@ -51,6 +51,7 @@ import { DockAdd } from './dockItme'
 import { DockSet } from './dockItme'
 import { LaunchpadDataAtom, LaunchpadShowAtom } from './launchpad'
 import type { shortcutData } from './types'
+/* =========| utils |========= */
 import { OPEN_URL, chunkArray } from './utils'
 
 /* =========| 持久化的数据 |========= */
@@ -132,7 +133,7 @@ const DockItem: FC<
     const [tooltipOpen, setTooltipOpen] = useState(false)
 
     return (
-        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <Popover open={popoverOpen}>
             <PopoverTrigger>
                 <Tooltip
                     open={tooltipOpen}
@@ -149,7 +150,7 @@ const DockItem: FC<
                                 backgroundColor: props.bgColor,
                             }}
                             className='relative size-16 cursor-pointer overflow-clip rounded-lg'
-                            onClick={() => OPEN_URL(props.url)}
+                            onClick={() => OPEN_URL(props.url, true)}
                             onContextMenu={(e) => {
                                 e.preventDefault()
                                 setPopoverOpen(true)
@@ -168,7 +169,11 @@ const DockItem: FC<
                     </TooltipContent>
                 </Tooltip>
             </PopoverTrigger>
-            <PopoverContent className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'>
+            <PopoverContent
+                onInteractOutside={() => setPopoverOpen(false)}
+                onEscapeKeyDown={() => setPopoverOpen(false)}
+                className='*:!text-foreground w-max gap-y-1 bg-black/60 p-1 backdrop-blur-sm *:flex *:w-full *:justify-start'
+            >
                 <Button
                     onClick={() => OPEN_URL(props.url, true)}
                     className='hover:bg-foreground/10 bg-transparent p-1'
@@ -177,7 +182,10 @@ const DockItem: FC<
                 </Button>
 
                 <Button
-                    onClick={() => onDelete(props.id)}
+                    onClick={() => {
+                        onDelete(props.id)
+                        setPopoverOpen(false)
+                    }}
                     className='hover:bg-foreground/10 bg-transparent p-1'
                 >
                     <Trash2 /> 删除
@@ -186,7 +194,9 @@ const DockItem: FC<
                 <DockSet
                     className='hover:bg-foreground/10 bg-transparent p-1'
                     value={props}
-                    onChange={onChange}
+                    onChange={(newValue) => {
+                        onChange(newValue)
+                    }}
                 >
                     <Button className='hover:bg-foreground/10 bg-transparent p-1'>
                         <NotebookPen /> 编辑
@@ -197,7 +207,10 @@ const DockItem: FC<
                     <Button
                         key={item.uuid}
                         className='hover:bg-foreground/10 bg-transparent p-1'
-                        onClick={() => OPEN_URL(item.url)}
+                        onClick={() => {
+                            OPEN_URL(item.url, true)
+                            setPopoverOpen(false)
+                        }}
                     >
                         <Link /> {item.text}
                     </Button>
@@ -205,7 +218,10 @@ const DockItem: FC<
 
                 <Button
                     className='hover:bg-foreground/10 bg-transparent p-1'
-                    onClick={() => onMoveToLaunchpad(props.id)}
+                    onClick={() => {
+                        onMoveToLaunchpad(props.id)
+                        setPopoverOpen(false)
+                    }}
                 >
                     <ArrowUpToLine /> 移动到启动台
                 </Button>
